@@ -1,6 +1,7 @@
 import streamlit as st
 from PIL import Image
-import google.generativeai as genai
+from groq import Groq
+import base64
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(page_title="Giải Mã Bức Tranh Địa Lý", page_icon="🌍", layout="wide")
@@ -11,12 +12,11 @@ if "ai_suggestions" not in st.session_state:
 if "current_image_name" not in st.session_state:
     st.session_state.current_image_name = ""
 
-# --- BẢO MẬT: LẤY API KEY TỪ STREAMLIT SECRETS ---
+# --- BẢO MẬT: LẤY API KEY CỦA GROQ ---
 try:
-    # Ứng dụng sẽ tự động tìm key bạn đã lưu trong mục Settings > Secrets
-    api_key = st.secrets["GEMINI_API_KEY"]
+    api_key = st.secrets["GROQ_API_KEY"]
 except KeyError:
-    st.error("⚠️ Hệ thống chưa được cấu hình API Key. Vui lòng kiểm tra lại phần Settings > Secrets trên Streamlit Cloud.")
+    st.error("⚠️ Hệ thống chưa tìm thấy GROQ_API_KEY trong phần Settings > Secrets.")
     api_key = None
 
 # --- GIAO DIỆN CHÍNH ---
@@ -39,28 +39,46 @@ if uploaded_file is not None:
     with col1:
         st.image(image, caption="Bức tranh bí ẩn cần giải mã hôm nay", use_container_width=True)
         
-        # Nút gọi AI phân tích (Chỉ hiện khi đã có api_key)
+        # Nút gọi AI phân tích
         if api_key:
             if st.button("🤖 Nhờ Trợ lý AI phân tích và gợi ý câu hỏi", use_container_width=True):
-                with st.spinner("AI đang quét dữ liệu địa lý từ bức ảnh..."):
+                with st.spinner("AI đang quét dữ liệu siêu tốc..."):
                     try:
-                        genai.configure(api_key=api_key)
-                        # Sử dụng mô hình 2.5 theo cập nhật mới nhất
-                        model = genai.GenerativeModel('gemini-1.5-pro')
+                        # Chuyển đổi ảnh sang định dạng Base64 để gửi cho Groq
+                        uploaded_file.seek(0)
+                        base64_image = base64.b64encode(uploaded_file.read()).decode('utf-8')
+                        
+                        client = Groq(api_key=api_key)
                         
                         prompt = """
-                        Bạn là một giáo viên Địa lý cấp THCS xuất sắc. Hãy quan sát kỹ bức ảnh này và soạn một hệ thống câu hỏi gợi mở để giáo viên hỏi học sinh trên lớp, theo đúng 4 bước sau:
-                        1. Quan sát: 2 câu hỏi yêu cầu học sinh liệt kê chi tiết, màu sắc, đối tượng địa lý có trong ảnh.
-                        2. Phân tích: 2 câu hỏi yêu cầu học sinh giải thích đặc điểm, nguyên nhân (Tại sao lại có hình dạng/màu sắc/hiện tượng đó?).
-                        3. Suy luận: 2 câu hỏi yêu cầu học sinh liên kết hình ảnh với khí hậu, con người, kinh tế, môi trường.
-                        4. Tổng hợp: 1 câu hỏi chốt lại bài học hoặc thông điệp địa lý.
-                        Trình bày ngắn gọn, súc tích, ngôn từ phù hợp với học sinh lớp 6-9.
+                        Bạn là một giáo viên Địa lý cấp THCS. Hãy quan sát kỹ bức ảnh này và soạn hệ thống câu hỏi gợi mở để hỏi học sinh trên lớp theo 4 bước:
+                        1. Quan sát: 2 câu hỏi liệt kê chi tiết trong ảnh.
+                        2. Phân tích: 2 câu hỏi giải thích đặc điểm, nguyên nhân.
+                        3. Suy luận: 2 câu hỏi liên kết hình ảnh với khí hậu, con người, kinh tế.
+                        4. Tổng hợp: 1 câu hỏi chốt lại thông điệp địa lý.
+                        Trình bày bằng tiếng Việt, ngắn gọn, súc tích.
                         """
-                        response = model.generate_content([prompt, image])
-                        st.session_state.ai_suggestions = response.text
+                        
+                        # Gọi mô hình Llama 3.2 Vision siêu tốc của Groq
+                        response = client.chat.completions.create(
+                            model="llama-3.2-11b-vision-preview",
+                            messages=[
+                                {
+                                    "role": "user",
+                                    "content": [
+                                        {"type": "text", "text": prompt},
+                                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}
+                                    ]
+                                }
+                            ],
+                            temperature=0.4,
+                            max_tokens=1024
+                        )
+                        
+                        st.session_state.ai_suggestions = response.choices[0].message.content
                         st.success("Đã phân tích xong! Hãy xem gợi ý bên phần Quy trình Giải mã.")
                     except Exception as e:
-                        st.error(f"Có lỗi xảy ra khi gọi AI: {e}")
+                        st.error(f"Có lỗi xảy ra: {e}")
 
     with col2:
         st.subheader("🔍 Quy trình Giải mã")
@@ -73,22 +91,18 @@ if uploaded_file is not None:
         
         with tab1:
             st.markdown("### 👁️ Bước 1: Quan sát tổng thể")
-            st.info("Yêu cầu học sinh nhìn kỹ và liệt kê những gì thấy trong tranh.")
             st.text_area("Ghi chép nhanh ý kiến học sinh:", key="obs", height=100)
                 
         with tab2:
             st.markdown("### 🧠 Bước 2: Phân tích chi tiết")
-            st.info("Kết nối các chi tiết hình ảnh với kiến thức nền.")
             st.text_area("Ghi chép nhanh ý kiến học sinh:", key="ana", height=100)
                 
         with tab3:
             st.markdown("### 🕵️ Bước 3: Suy luận & Giải mã")
-            st.info("Đưa ra kết luận về ý nghĩa địa lý, mối quan hệ nhân quả.")
             st.text_area("Ghi chép nhanh ý kiến học sinh:", key="inf", height=100)
                 
         with tab4:
             st.markdown("### 📝 Bước 4: Tổng hợp")
-            st.success("Rút ra thông điệp địa lý chính từ bức tranh.")
             st.text_area("Kết luận bài học:", key="sum", height=120)
             
             if st.button("🎉 Hoàn thành Giải mã!", use_container_width=True):
