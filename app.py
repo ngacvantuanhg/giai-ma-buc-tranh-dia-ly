@@ -86,6 +86,20 @@ if uploaded_file is not None:
         if st.session_state.ai_suggestions:
             with st.expander("💡 BỘ CÂU HỎI GỢI Ý TỪ AI (Dành cho giáo viên)", expanded=True):
                 st.markdown(st.session_state.ai_suggestions)
+                if st.session_state.ai_suggestions:
+            with st.expander("💡 BỘ CÂU HỎI GỢI Ý TỪ AI (Dành cho giáo viên)", expanded=True):
+                st.markdown(st.session_state.ai_suggestions)
+                
+                # --- TÍNH NĂNG MỚI: TẢI VỀ MÁY LÀM GIÁO ÁN ---
+                st.download_button(
+                    label="💾 Tải bộ câu hỏi này về máy",
+                    data=st.session_state.ai_suggestions,
+                    file_name=f"Giao_an_Dia_ly_{st.session_state.current_image_name}.txt",
+                    mime="text/plain",
+                    use_container_width=True
+                )
+
+        tab1, tab2, tab3, tab4 = st.tabs(["1. Quan sát", "2. Phân tích", "3. Suy luận", "4. Tổng hợp"])
         
         tab1, tab2, tab3, tab4 = st.tabs(["1. Quan sát", "2. Phân tích", "3. Suy luận", "4. Tổng hợp"])
         
