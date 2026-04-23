@@ -22,7 +22,7 @@ except KeyError:
 
 # --- 3. GIAO DIỆN CHÍNH ---
 st.title("🌍 Ứng Dụng: Giải Mã Bức Tranh Địa Lý")
-st.markdown("*Công cụ hỗ trợ giảng dạy tương tác cho giáo viên Địa lý - Trường THCS Lê Quý Đôn*")
+st.markdown("*Công cụ hỗ trợ giảng dạy tương tác cho giáo viên Địa lý - Trường THCS Lê Quý Đôn, phường Hà Giang 1, tỉnh Tuyên Quang*")
 st.markdown("---")
 
 # Tải ảnh lên
