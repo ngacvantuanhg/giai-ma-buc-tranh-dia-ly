@@ -54,12 +54,12 @@ if uploaded_file is not None:
                         client = Groq(api_key=api_key)
                         
                         prompt = """
-                        Bạn là một chuyên gia giảng dạy Địa lý cấp THCS. Hãy quan sát ảnh và soạn hệ thống câu hỏi gợi mở cho học sinh:
-                        1. Quan sát: 2 câu hỏi mô tả sự vật, hiện tượng thấy rõ trong ảnh.
-                        2. Phân tích: 2 câu hỏi giải thích tại sao có hiện tượng đó.
-                        3. Suy luận: 2 câu hỏi về mối liên hệ với kinh tế, môi trường hoặc con người.
-                        4. Tổng hợp: 1 câu hỏi chốt thông điệp chính.
-                        Trình bày bằng tiếng Việt, ngôn ngữ sư phạm chuẩn mực.
+                        Bạn là một chuyên gia giảng dạy Địa lý cấp THCS. Hãy quan sát ảnh và soạn hệ thống câu hỏi gợi mở KÈM THEO ĐÁP ÁN CHI TIẾT cho giáo viên, chia làm 4 bước:
+                        1. Quan sát: 2 câu hỏi mô tả sự vật, hiện tượng thấy rõ trong ảnh. (Dưới mỗi câu hỏi, ghi rõ [Đáp án gợi ý: ...])
+                        2. Phân tích: 2 câu hỏi giải thích tại sao có hiện tượng đó. (Dưới mỗi câu hỏi, ghi rõ [Đáp án gợi ý: ...])
+                        3. Suy luận: 2 câu hỏi về mối liên hệ với kinh tế, môi trường hoặc con người. (Dưới mỗi câu hỏi, ghi rõ [Đáp án gợi ý: ...])
+                        4. Tổng hợp: 1 câu hỏi chốt thông điệp chính. (Kèm theo [Đáp án gợi ý: ...])
+                        Trình bày bằng tiếng Việt, ngôn ngữ sư phạm chuẩn mực, phân tách câu hỏi và đáp án rõ ràng để giáo viên dễ đọc.
                         """
                         
                         # Sử dụng mô hình Llama 4 Scout mới nhất
