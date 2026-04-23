@@ -89,10 +89,10 @@ if uploaded_file is not None:
                 
                 # --- TÍNH NĂNG MỚI: TẢI VỀ MÁY LÀM GIÁO ÁN ---
                 st.download_button(
-                    label="💾 Tải bộ câu hỏi này về máy",
+                    label="📝 Tải về máy (Mở bằng Word)",
                     data=st.session_state.ai_suggestions,
-                    file_name=f"Giao_an_Dia_ly_{st.session_state.current_image_name}.txt",
-                    mime="text/plain",
+                    file_name=f"Giao_an_Dia_ly_{st.session_state.current_image_name}.doc",
+                    mime="application/msword",
                     use_container_width=True
                 )
         
