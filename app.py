@@ -47,7 +47,7 @@ if uploaded_file is not None:
                     try:
                         genai.configure(api_key=api_key)
                         # Dùng model vision chuẩn của Gemini
-                        model = genai.GenerativeModel('gemini-1.5-flash')
+                        model = genai.GenerativeModel('gemini-2.5-flash')
                         
                         prompt = """
                         Bạn là một giáo viên Địa lý cấp THCS xuất sắc. Hãy quan sát kỹ bức ảnh này và soạn một hệ thống câu hỏi gợi mở để giáo viên hỏi học sinh trên lớp, theo đúng 4 bước sau:
