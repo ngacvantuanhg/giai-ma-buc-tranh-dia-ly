@@ -46,7 +46,7 @@ if uploaded_file is not None:
                     try:
                         genai.configure(api_key=api_key)
                         # Sử dụng mô hình 2.5 theo cập nhật mới nhất
-                        model = genai.GenerativeModel('gemini-2.0-flash')
+                        model = genai.GenerativeModel('gemini-1.5-pro')
                         
                         prompt = """
                         Bạn là một giáo viên Địa lý cấp THCS xuất sắc. Hãy quan sát kỹ bức ảnh này và soạn một hệ thống câu hỏi gợi mở để giáo viên hỏi học sinh trên lớp, theo đúng 4 bước sau:
