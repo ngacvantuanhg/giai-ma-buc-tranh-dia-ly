@@ -2,6 +2,7 @@ import streamlit as st
 from PIL import Image
 from groq import Groq
 import base64
+import markdown
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(page_title="Giải Mã Bức Tranh Địa Lý", page_icon="🌍", layout="wide")
@@ -87,10 +88,28 @@ if uploaded_file is not None:
             with st.expander("💡 BỘ CÂU HỎI GỢI Ý TỪ AI (Dành cho giáo viên)", expanded=True):
                 st.markdown(st.session_state.ai_suggestions)
                 
-                # --- TÍNH NĂNG MỚI: TẢI VỀ MÁY LÀM GIÁO ÁN ---
+                # --- TÍNH NĂNG MỚI: TẢI VỀ MÁY LÀM GIÁO ÁN (ĐÃ CĂN CHỈNH ĐẸP) ---
+                # Dịch Markdown sang HTML
+                html_text = markdown.markdown(st.session_state.ai_suggestions)
+                
+                # Bọc văn bản vào khung chuẩn của Word (Font Times New Roman, size 14)
+                word_content = f"""
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head>
+                    <meta charset="utf-8">
+                    <title>Giáo Án</title>
+                </head>
+                <body style="font-family: 'Times New Roman', serif; font-size: 14pt; line-height: 1.5;">
+                    <h2 style="text-align: center; color: #2c3e50;">HỆ THỐNG CÂU HỎI GIẢI MÃ</h2>
+                    <hr>
+                    {html_text}
+                </body>
+                </html>
+                """
+
                 st.download_button(
-                    label="📝 Tải về máy (Mở bằng Word)",
-                    data=st.session_state.ai_suggestions,
+                    label="📝 Tải giáo án về máy (Bản Word chuẩn)",
+                    data=word_content,
                     file_name=f"Giao_an_Dia_ly_{st.session_state.current_image_name}.doc",
                     mime="application/msword",
                     use_container_width=True
