@@ -5,7 +5,7 @@ import base64
 import markdown
 
 # --- 1. CẤU HÌNH TRANG ---
-st.set_page_config(page_title="Giải Mã Bức Tranh Địa Lý", page_icon="🌍", layout="wide")
+st.set_page_config(page_title="Giải Mã Bức Tranh Lịch Sử - Địa Lý", page_icon="🌍", layout="wide")
 
 # Khởi tạo session_state để lưu trữ dữ liệu bền vững
 if "ai_suggestions" not in st.session_state:
