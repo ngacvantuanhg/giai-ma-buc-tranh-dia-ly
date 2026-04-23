@@ -115,9 +115,7 @@ if uploaded_file is not None:
                     use_container_width=True
                 )
         
-        tab1, tab2, tab3, tab4 = st.tabs(["1. Quan sát", "2. Phân tích", "3. Suy luận", "4. Tổng hợp"])
-        
-        tab1, tab2, tab3, tab4 = st.tabs(["1. Quan sát", "2. Phân tích", "3. Suy luận", "4. Tổng hợp"])
+       tab1, tab2, tab3, tab4 = st.tabs(["1. Quan sát", "2. Phân tích", "3. Suy luận", "4. Tổng hợp"])
         
         with tab1:
             st.markdown("### 👁️ Bước 1: Quan sát tổng thể")
