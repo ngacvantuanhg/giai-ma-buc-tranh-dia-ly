@@ -5,20 +5,19 @@ import google.generativeai as genai
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(page_title="Giải Mã Bức Tranh Địa Lý", page_icon="🌍", layout="wide")
 
-# Khởi tạo session_state để lưu kết quả AI, tránh load lại khi gõ chữ
+# Khởi tạo session_state để lưu kết quả AI
 if "ai_suggestions" not in st.session_state:
     st.session_state.ai_suggestions = ""
 if "current_image_name" not in st.session_state:
     st.session_state.current_image_name = ""
 
-# --- SIDEBAR: CẤU HÌNH AI ---
-with st.sidebar:
-    st.header("⚙️ Cấu hình Trợ lý AI")
-    st.markdown("Nhập API Key của Google Gemini để kích hoạt tính năng tự động gợi ý câu hỏi.")
-    api_key = st.text_input("🔑 Google Gemini API Key:", type="password")
-    st.markdown("*(Nhận API Key miễn phí tại [Google AI Studio](https://aistudio.google.com/app/apikey))*")
-    st.divider()
-    st.markdown("**Hướng dẫn sử dụng:**\n1. Nhập API Key\n2. Tải ảnh lên\n3. Bấm nút nhờ AI phân tích\n4. Dùng câu hỏi AI gợi ý để dẫn dắt học sinh.")
+# --- BẢO MẬT: LẤY API KEY TỪ STREAMLIT SECRETS ---
+try:
+    # Ứng dụng sẽ tự động tìm key bạn đã lưu trong mục Settings > Secrets
+    api_key = st.secrets["GEMINI_API_KEY"]
+except KeyError:
+    st.error("⚠️ Hệ thống chưa được cấu hình API Key. Vui lòng kiểm tra lại phần Settings > Secrets trên Streamlit Cloud.")
+    api_key = None
 
 # --- GIAO DIỆN CHÍNH ---
 st.title("🌍 Ứng Dụng: Giải Mã Bức Tranh Địa Lý")
@@ -40,13 +39,13 @@ if uploaded_file is not None:
     with col1:
         st.image(image, caption="Bức tranh bí ẩn cần giải mã hôm nay", use_container_width=True)
         
-        # Nút gọi AI phân tích
+        # Nút gọi AI phân tích (Chỉ hiện khi đã có api_key)
         if api_key:
             if st.button("🤖 Nhờ Trợ lý AI phân tích và gợi ý câu hỏi", use_container_width=True):
                 with st.spinner("AI đang quét dữ liệu địa lý từ bức ảnh..."):
                     try:
                         genai.configure(api_key=api_key)
-                        # Dùng model vision chuẩn của Gemini
+                        # Sử dụng mô hình 2.5 theo cập nhật mới nhất
                         model = genai.GenerativeModel('gemini-2.5-flash')
                         
                         prompt = """
@@ -62,13 +61,10 @@ if uploaded_file is not None:
                         st.success("Đã phân tích xong! Hãy xem gợi ý bên phần Quy trình Giải mã.")
                     except Exception as e:
                         st.error(f"Có lỗi xảy ra khi gọi AI: {e}")
-        else:
-            st.warning("👈 Hãy nhập API Key ở menu bên trái để mở khóa tính năng AI!")
 
     with col2:
         st.subheader("🔍 Quy trình Giải mã")
         
-        # Nếu AI đã có kết quả, hiển thị lên trên cùng để giáo viên dễ xem
         if st.session_state.ai_suggestions:
             with st.expander("💡 BỘ CÂU HỎI GỢI Ý TỪ AI (Dành cho giáo viên)", expanded=True):
                 st.markdown(st.session_state.ai_suggestions)
